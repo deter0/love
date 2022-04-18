@@ -1,0 +1,10 @@
+int add(int x, int y) {
+	return x + y;
+}
+void main() {
+	<~
+		var z = ~>add(2, 2);
+	<~
+	~> z int;
+	printf("%d\n", z); // 4;
+}
