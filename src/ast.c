@@ -1,8 +1,10 @@
 #include "log.h"
+#include "parser.h"
 #include "tokenizer.h"
 #include "ast.h"
 
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
@@ -72,8 +74,61 @@ ASTMethod *functionCallNode() {
 	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)chp(malloc(sizeof(struct ASTNodeCallFunctionData)));
 	data->Type = FUNCTION_CALL;
 	data->FunctionToCall = "NULL";
+	data->ParameterCount = 0;
+	data->ParameterAllocated = 10;
+	data->Parameters =
+		(struct ASTNodeValue**) chp(malloc(sizeof(struct ASTNodeValue*) * data->ParameterAllocated));
+
 	method->NodeData = (void*)data;
 	return method;
+}
+void dumpFunctionCallData(FILE *fd, ASTMethod *functionCall) {
+	l_assert(CheckASTMethodDataType(functionCall, FUNCTION_CALL), "Expected function call data type for `functionCallNodeAddParameter`");
+	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)functionCall->NodeData;
+	fprintf(fd, "Call function: `%s`", data->FunctionToCall);
+	fprintf(fd, "\tArguments: `%ld`\n", data->ParameterCount);
+	for (size_t i = 0; i < data->ParameterCount; i++) {
+		struct ASTNodeValue *parameter = data->Parameters[i];
+		if (parameter->isConstant) {
+			if (!strcmp("string", parameter->constantType)) {
+				fprintf(fd, "\t\tParameter Constant literal: %s\n", (char*)parameter->constantData);
+			} else {
+				NOT_IMPLEMENTED;
+			}
+		} else if (parameter->isReference) {
+			fprintf(fd, "\t\tParameter variable reference: `%s`\n", (char*)parameter->variableReference);
+		} else {
+			set_error_cat("[UNREACHABLE]\n");
+			panic(true);
+		}
+		// fprintf(fd, "", data->Parameters[i]->)
+	}
+}
+void functionCallNodeAddParameter(ASTMethod *functionCall, struct ASTNodeValue *parameter) {
+	l_assert(CheckASTMethodDataType(functionCall, FUNCTION_CALL), "Expected function call data type for `functionCallNodeAddParameter`");
+	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)functionCall->NodeData;
+	if (data->ParameterCount + 1 >= data->ParameterAllocated) {
+		data->ParameterAllocated *= 2;
+		data->Parameters = (struct ASTNodeValue**)chp(realloc(data->Parameters, sizeof(struct ASTNodeValue*) * data->ParameterAllocated));
+	}
+	data->Parameters[data->ParameterCount] = parameter;
+	data->ParameterCount++;
+}
+
+#define NODE_VALUE "ASTNodeValue"
+struct ASTNodeValue *parseValue(TokenPool *tokens, size_t from) {
+	struct ASTNodeValue *value = (struct ASTNodeValue*)chp(malloc(sizeof(struct ASTNodeValue)));
+	value->Type = NODE_VALUE;
+	if (tokens->Tokens[from]->Type == TOKEN_WORD) {
+		char *wordValue = get_value(tokens->Tokens[from]->ParseResult);
+		value->isReference = true;
+		value->variableReference = wordValue;
+	} else if (tokens->Tokens[from]->Type == TOKEN_STRING_LITERAL) {
+		value->isConstant = true;
+		value->constantType = "string";
+		value->constantData = get_value(tokens->Tokens[from]->ParseResult);
+	}
+	return value;
 }
 
 ASTMethod *constructAST(TokenPool *pool) {
@@ -134,8 +189,18 @@ ASTMethod *constructAST(TokenPool *pool) {
 					// TODO: Construct parameters
 					TokenPool2D *params_split = tokenPoolSplit(params_raw, TOKEN_COMMA);
 					// printf("%ld\n", params_split->Length);
+					// struct ASTNodeCallFunctionData
+					ASTMethod *functionCall = functionCallNode();
+					for (size_t k = 0; k < params_split->Length; k++) {
+						struct ASTNodeValue *value = parseValue(params_split->TokenPools[k], 0);
+						functionCallNodeAddParameter(functionCall, value);
+					}
+					executionStartAddMethod(ExecutionStart, functionCall);
+					// functionCallNodeAddParameter(ASTMethod *functionCall, struct ASTNodeValue *parameter)
+
 					printf("Function decleration:\n\tName: `%s`\n\tParameters:%s\n", get_value(next->ParseResult), TERM_GREEN());
-					logTokenPool2D(stdout, params_split);
+					// logTokenPool2D(stdout, params_split);
+					NOT_IMPLEMENTED;
 				} else {
 					set_error_cat("[CONSTRUCT AST]");
 					fprintf(stderr, "Expected <TOKEN_OP_EQ, TOKEN_SEMICOLON, TOKEN_OPEN_PAREN> after: `%s = !`, got %s.\n", get_value(token->ParseResult), TOKEN_STRINGS[nnext->Type]);
@@ -147,32 +212,42 @@ ASTMethod *constructAST(TokenPool *pool) {
 			nnext = pool->Tokens[i + 1];
 			if (next->Type == TOKEN_OPEN_PAREN) { // Function Call
 				fprintf(stdout, "Detected function call\n");
-        // find closing parenetheesis
-        int d = 0;
-        TokenPool *arguments = tokenPool(15);
-        size_t j;
-        for (j = i + 2; j < pool->Length; j++) {
-          addToken(arguments, pool->Tokens[j]);
-          if (pool->Tokens[j]->Type == TOKEN_OPEN_PAREN)
-            d++;
-          else if (pool->Tokens[j]->Type == TOKEN_CLOSE_PAREN) {
-            if (d <= 0) {
-              break;
-            } else {
-              d--;
-            }
-          }
-          if (j == pool->Length - 1) {
-            set_error_cat("[GENERATE AST]");
-            fprintf(stderr, "Expected to close call to function `%s` with `)`\n", get_value(token->ParseResult));
-            panic(true);
-          }
-        }
-        TokenPool2D *arguments_parsed = tokenPoolSplit(arguments, TOKEN_COMMA);
-        printf("Count: %ld\n", arguments->Length);
-        logTokenPool2D(stdout, arguments_parsed);
-        // logTokenPool(stdout, arguments);
-				panic(false);
+				// find closing parenetheesis
+				int d = 0;
+				TokenPool *arguments = tokenPool(15);
+				size_t j;
+				for (j = i + 2; j < pool->Length; j++) {
+				addToken(arguments, pool->Tokens[j]);
+				if (pool->Tokens[j]->Type == TOKEN_OPEN_PAREN)
+					d++;
+				else if (pool->Tokens[j]->Type == TOKEN_CLOSE_PAREN) {
+					if (d <= 0) {
+					break;
+					} else {
+					d--;
+					}
+				}
+				if (j == pool->Length - 1) {
+					set_error_cat("[GENERATE AST]");
+					fprintf(stderr, "Expected to close call to function `%s` with `)`\n", get_value(token->ParseResult));
+					panic(true);
+				}
+				}
+				TokenPool2D *arguments_parsed = tokenPoolSplit(arguments, TOKEN_COMMA);
+				printf("Count: %ld\n", arguments->Length);
+				
+				logTokenPool2D(stdout, arguments_parsed);
+
+				ASTMethod *functionCall = functionCallNode();
+				struct ASTNodeCallFunctionData *value = (struct ASTNodeCallFunctionData*)functionCall->NodeData;
+				value->FunctionToCall = get_value(token->ParseResult);
+				for (size_t k = 0; k < arguments_parsed->Length; k++) {
+					struct ASTNodeValue *value = parseValue(arguments_parsed->TokenPools[k], 0);
+					functionCallNodeAddParameter(functionCall, value);
+				}
+				executionStartAddMethod(ExecutionStart, functionCall);
+
+				i = j + 1;
 			}
 		} else {
 			set_error_cat("[CONSTRUCT AST]");
@@ -180,7 +255,7 @@ ASTMethod *constructAST(TokenPool *pool) {
 			panic(true);
 		}
 	}
-#ifdef DEBUG
+#if 1
 	printf("\n");
 	struct ASTNodeExecutionStartData *data = (struct ASTNodeExecutionStartData*)ExecutionStart->NodeData;
 	for (size_t i = 0; i < data->MethodsLength; i++) {
@@ -188,7 +263,10 @@ ASTMethod *constructAST(TokenPool *pool) {
 		printf("Method: `%s`\n", methodData->Type);
 		if (CheckASTMethodDataType(data->Methods[i], VARIABLE_TYPE)) {
 			dumpVariableData(stdout, data->Methods[i]);
+		} else if (CheckASTMethodDataType(data->Methods[i], FUNCTION_CALL)) {
+			dumpFunctionCallData(stdout, data->Methods[i]);
 		}
+		printf("===============================================\n");
 	}
 #endif
 	return ExecutionStart;

@@ -1,12 +1,13 @@
 #pragma once
 #include "parser.h"
+#include <stdio.h>
 
 typedef enum TokenType {
 	TOKEN_UNDEFINED, //
 	TOKEN_NEW_LINE, //
 	TOKEN_SEMICOLON, //
 	TOKEN_KEYWORD_RETURN, //
-	TOKEN_STRING, //
+	TOKEN_STRING_LITERAL, //
 	TOKEN_CHAR, //
 	TOKEN_TYPE_VOID, //
 	TOKEN_TYPE_STRING,
@@ -37,7 +38,7 @@ char *TOKEN_STRINGS[100] = {
 	"TOKEN_NEW_LINE", //
 	"TOKEN_SEMICOLON", //
 	"TOKEN_KEYWORD_RETURN", //
-	"TOKEN_STRING", //
+	"TOKEN_STRING_LITERAL", //
 	"TOKEN_TYPE_CHAR", //
 	"TOKEN_TYPE_VOID", //
 	"TOKEN_TYPE_STRING",

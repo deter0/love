@@ -33,7 +33,7 @@ struct ASTNodeDeclareVariableData {
 	const char *DataStr;
 };
 
-struct ASTNodeParameter {
+struct ASTNodeValue {
 	const char *Type;
 	// It can be a reference to a variable example:
 	// foo(x)
@@ -50,6 +50,11 @@ struct ASTNodeParameter {
 struct ASTNodeCallFunctionData {
 	const char *Type;
 	const char *FunctionToCall;
-	struct ASTNodeParameter *Parameters;
+	struct ASTNodeValue **Parameters;
+	size_t ParameterCount;
+	size_t ParameterAllocated;
 	// TODO: Parameters
 };
+
+struct ASTNodeValue *parseValue(TokenPool *tokens, size_t from);
+ASTMethod *constructAST(TokenPool *pool);

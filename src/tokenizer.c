@@ -102,7 +102,7 @@ TokenPool *Tokenize(parse_result_pool *parsed) {
 		} else if (!strcmp("void", val)) {
 			tkn->Type = TOKEN_TYPE_VOID;
 		} else if (val[0] == '"' && val[strlen(val)-1] == '"') {
-			tkn->Type = TOKEN_STRING;
+			tkn->Type = TOKEN_STRING_LITERAL;
 		} else if (val[0] == '\'' && val[strlen(val)-1] == '\'') {
 			tkn->Type = TOKEN_CHAR;
 		} /*else if (!strcmp("\n", val)) {
