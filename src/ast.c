@@ -146,9 +146,33 @@ ASTMethod *constructAST(TokenPool *pool) {
 			next = pool->Tokens[i + 1];
 			nnext = pool->Tokens[i + 1];
 			if (next->Type == TOKEN_OPEN_PAREN) { // Function Call
-				fprintf(stderr, "Detected function call");
-				panic(true);
-                NOT_IMPLEMENTED;
+				fprintf(stdout, "Detected function call\n");
+        // find closing parenetheesis
+        int d = 0;
+        TokenPool *arguments = tokenPool(15);
+        size_t j;
+        for (j = i + 2; j < pool->Length; j++) {
+          addToken(arguments, pool->Tokens[j]);
+          if (pool->Tokens[j]->Type == TOKEN_OPEN_PAREN)
+            d++;
+          else if (pool->Tokens[j]->Type == TOKEN_CLOSE_PAREN) {
+            if (d <= 0) {
+              break;
+            } else {
+              d--;
+            }
+          }
+          if (j == pool->Length - 1) {
+            set_error_cat("[GENERATE AST]");
+            fprintf(stderr, "Expected to close call to function `%s` with `)`\n", get_value(token->ParseResult));
+            panic(true);
+          }
+        }
+        TokenPool2D *arguments_parsed = tokenPoolSplit(arguments, TOKEN_COMMA);
+        printf("Count: %ld\n", arguments->Length);
+        logTokenPool2D(stdout, arguments_parsed);
+        // logTokenPool(stdout, arguments);
+				panic(false);
 			}
 		} else {
 			set_error_cat("[CONSTRUCT AST]");

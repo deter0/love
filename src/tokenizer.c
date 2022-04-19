@@ -62,9 +62,16 @@ void addToken2D(TokenPool2D *pool, TokenPool *to_add) {
 	pool->Length++;
 }
 
+// FIXME: This function has some problems LOL
 TokenPool2D *tokenPoolSplit(TokenPool *pool, TokenType Delimeter) {
 	TokenPool2D *result = tokenPool2D(pool->Allocated / 4);
 	uint32_t Last = 0;
+  if (pool->Length == 1) {
+    TokenPool *cpy = (TokenPool*)chp(malloc(sizeof(TokenPool)));
+    memcpy(cpy, pool, sizeof(TokenPool));
+    addToken2D(result, cpy);
+    return result;
+  }
 	for (size_t i = 0; i < pool->Length; i++) {
 		if (pool->Tokens[i]->Type == Delimeter || i == pool->Length-1) {
 			TokenPool *split = tokenPool(i - Last);

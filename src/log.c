@@ -13,7 +13,7 @@ void set_error_cat(char *cat) {
 }
 
 void panic(bool has_context) {
-    set_error_cat(has_context == true ? "\t↳ [FATAL ERROR]" : "[FATAL ERROR]");
+    set_error_cat(has_context == true ? "\t↳ [FATAL ERROR]" : "[FATAL ERROR (NO INFO)]");
     fprintf(stderr, "Fatal error, exiting (1)\n");
     exit(1);
 }
