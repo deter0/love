@@ -66,15 +66,15 @@ void dumpVariableData(FILE *fd, ASTMethod *variable_method) {
 }
 
 #define FUNCTION_CALL "MethodFunctionCall"
-// ASTMethod *functionCallNode() {
-// 	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
-// 	method->NodeType = METHOD_CALL_FUNCTION;
-// 	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)chp(malloc(sizeof(struct ASTNodeCallFunctionData)));
-// 	data->Type = FUNCTION_CALL;
-// 	data->FunctionToCall = "NULL";
-// 	method->NodeData = (void*)data;
-// 	return method;
-// }
+ASTMethod *functionCallNode() {
+	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
+	method->NodeType = METHOD_CALL_FUNCTION;
+	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)chp(malloc(sizeof(struct ASTNodeCallFunctionData)));
+	data->Type = FUNCTION_CALL;
+	data->FunctionToCall = "NULL";
+	method->NodeData = (void*)data;
+	return method;
+}
 
 ASTMethod *constructAST(TokenPool *pool) {
 	ASTMethod *ExecutionStart = executionStartNode();
@@ -134,7 +134,7 @@ ASTMethod *constructAST(TokenPool *pool) {
 					// TODO: Construct parameters
 					TokenPool2D *params_split = tokenPoolSplit(params_raw, TOKEN_COMMA);
 					// printf("%ld\n", params_split->Length);
-					printf("Function decleration:\n\tName: `%s`\n\tParameters:%s\n", get_value(next->ParseResult), TERM_GREEN);
+					printf("Function decleration:\n\tName: `%s`\n\tParameters:%s\n", get_value(next->ParseResult), TERM_GREEN());
 					logTokenPool2D(stdout, params_split);
 				} else {
 					set_error_cat("[CONSTRUCT AST]");
@@ -146,7 +146,9 @@ ASTMethod *constructAST(TokenPool *pool) {
 			next = pool->Tokens[i + 1];
 			nnext = pool->Tokens[i + 1];
 			if (next->Type == TOKEN_OPEN_PAREN) { // Function Call
-				
+				fprintf(stderr, "Detected function call");
+				panic(true);
+                NOT_IMPLEMENTED;
 			}
 		} else {
 			set_error_cat("[CONSTRUCT AST]");

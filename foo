@@ -1,0 +1,39 @@
+TOKEN: `int`
+TOKEN: `foo`
+TOKEN: `=`
+TOKEN: `2`
+TOKEN: `;`
+TOKEN: `<NEW LINE>`
+TOKEN: `int`
+TOKEN: `buzz`
+TOKEN: `=`
+TOKEN: `4`
+TOKEN: `;`
+TOKEN: `<NEW LINE>`
+TOKEN: `print`
+TOKEN: `(`
+TOKEN: `"Hello World"`
+TOKEN: `)`
+TOKEN: `;`
+17
+Added token: <TOKEN_TYPE_INT> : 'int'
+Added token: <TOKEN_WORD> : 'foo'
+Added token: <TOKEN_OP_EQ> : '='
+Added token: <TOKEN_WORD> : '2'
+Added token: <TOKEN_SEMICOLON> : ';'
+Added token: <TOKEN_WORD> : '
+'
+Added token: <TOKEN_TYPE_INT> : 'int'
+Added token: <TOKEN_WORD> : 'buzz'
+Added token: <TOKEN_OP_EQ> : '='
+Added token: <TOKEN_WORD> : '4'
+Added token: <TOKEN_SEMICOLON> : ';'
+Added token: <TOKEN_WORD> : '
+'
+Added token: <TOKEN_WORD> : 'print'
+Added token: <TOKEN_OPEN_PAREN> : '('
+Added token: <TOKEN_STRING> : '"Hello World"'
+Added token: <TOKEN_CLOSE_PAREN> : ')'
+Added token: <TOKEN_SEMICOLON> : ';'
+Is type, int
+Is type, int

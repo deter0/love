@@ -21,7 +21,7 @@ void addToken(TokenPool *pool, Token *to_add) {
 }
 char *indent = "";
 void logTokenPool(FILE *fd, TokenPool *self) {
-	fprintf(fd, "%s%sTokenPool%s {\n", indent, TERM_CYAN, TERM_DEFAULT);
+	fprintf(fd, "%s%sTokenPool%s {\n", indent, TERM_CYAN(), TERM_DEFAULT());
 	for (size_t i = 0; i < self->Length; i++) {
 		char *val = get_value(self->Tokens[i]->ParseResult);
 		if (!strcmp(val, "\n")) {
@@ -29,15 +29,15 @@ void logTokenPool(FILE *fd, TokenPool *self) {
 		}
 		fprintf(fd,
 			"\t%sToken %s<%s>%s: %s\"%s\"%s,\n",
-			indent, TERM_RED,
-			TOKEN_STRINGS[self->Tokens[i]->Type], TERM_DEFAULT, TERM_GREEN,
-			get_value(self->Tokens[i]->ParseResult), TERM_DEFAULT
+			indent, TERM_RED(),
+			TOKEN_STRINGS[self->Tokens[i]->Type], TERM_DEFAULT(), TERM_GREEN(),
+			get_value(self->Tokens[i]->ParseResult), TERM_DEFAULT()
 		);
 	}
 	fprintf(fd, "%s}\n", indent);
 }
 void logTokenPool2D(FILE *fd, TokenPool2D *self) {
-	fprintf(fd, "%sTokenPool2D%s [\n", TERM_CYAN, TERM_DEFAULT);
+	fprintf(fd, "%sTokenPool2D%s [\n", TERM_CYAN(), TERM_DEFAULT());
 	indent = "\t";
 	for (size_t i = 0; i < self->Length; i++) {
 		logTokenPool(fd, self->TokenPools[i]);

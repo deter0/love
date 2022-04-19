@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 
-#define TERM_RED "\033[0;31m"
-#define TERM_GREEN "\033[0;32m"
-#define TERM_BLUE "\033[0;34m"
-#define TERM_CYAN "\033[0;36m"
-#define TERM_DEFAULT "\033[0m"
+const char *TERM_RED();
+const char *TERM_GREEN(); 
+const char *TERM_BLUE();
+const char *TERM_CYAN();
+const char *TERM_DEFAULT();
 
 void apply_color(FILE *fs, char *color);
 void set_error_cat(char *cat);
