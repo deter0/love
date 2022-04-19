@@ -35,12 +35,21 @@ struct ASTNodeDeclareVariableData {
 
 struct ASTNodeParameter {
 	const char *Type;
+	// It can be a reference to a variable example:
+	// foo(x)
 	bool isReference;
 	const char *variableReference;
+	// Or it can be a constant for example:
+	// foo(4)
+	// foo("Buzz")
+	bool isConstant;
+	const char *constantType;
+	void *constantData;
 };
 
 struct ASTNodeCallFunctionData {
 	const char *Type;
 	const char *FunctionToCall;
+	ASTNodeParameter *Parameters;
 	// TODO: Parameters
 };

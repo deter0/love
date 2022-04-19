@@ -66,15 +66,15 @@ void dumpVariableData(FILE *fd, ASTMethod *variable_method) {
 }
 
 #define FUNCTION_CALL "MethodFunctionCall"
-// ASTMethod *functionCallNode() {
-// 	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
-// 	method->NodeType = METHOD_CALL_FUNCTION;
-// 	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)chp(malloc(sizeof(struct ASTNodeCallFunctionData)));
-// 	data->Type = FUNCTION_CALL;
-// 	data->FunctionToCall = "NULL";
-// 	method->NodeData = (void*)data;
-// 	return method;
-// }
+ASTMethod *functionCallNode() {
+	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
+	method->NodeType = METHOD_CALL_FUNCTION;
+	struct ASTNodeCallFunctionData *data = (struct ASTNodeCallFunctionData*)chp(malloc(sizeof(struct ASTNodeCallFunctionData)));
+	data->Type = FUNCTION_CALL;
+	data->FunctionToCall = "NULL";
+	method->NodeData = (void*)data;
+	return method;
+}
 
 ASTMethod *constructAST(TokenPool *pool) {
 	ASTMethod *ExecutionStart = executionStartNode();
