@@ -50,6 +50,10 @@ struct ASTNodeParameter {
 struct ASTNodeCallFunctionData {
 	const char *Type;
 	const char *FunctionToCall;
+<<<<<<< HEAD
 	struct ASTNodeParameter *Parameters;
+=======
+	ASTNodeParameter *Parameters;
+>>>>>>> c51feb9ee76a0a868f3ed627ee2ebb045abe9c94
 	// TODO: Parameters
 };
