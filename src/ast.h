@@ -58,3 +58,7 @@ struct ASTNodeCallFunctionData {
 
 struct ASTNodeValue *parseValue(TokenPool *tokens, size_t from);
 ASTMethod *constructAST(TokenPool *pool);
+
+#define NODE_VALUE "ASTNodeValue"
+#define FUNCTION_CALL "MethodFunctionCall"
+#define VARIABLE_TYPE "MethodDeclareVariable"

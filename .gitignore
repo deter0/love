@@ -1,3 +1,4 @@
 .vscode/
-.replit
+.cache/
 love
+build/

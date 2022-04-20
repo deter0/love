@@ -12,6 +12,7 @@
 #include "parser.c"
 #include "log.c"
 #include "ast.c"
+#include "interpreter.c"
 
 char *slurp_file(char *file_path) {
     FILE *fp = fopen(file_path, "rb");
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
         if (!file)
             panic(true);
         TokenPool *tokens = Tokenize(parse_string(file));
-        constructAST(tokens);
+        interpretProgram(constructAST(tokens));
         
         fh++;
         argv++;

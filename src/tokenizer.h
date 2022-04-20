@@ -33,7 +33,7 @@ typedef enum TokenType {
 	TOKEN_COMPARE //
 } TokenType;
 
-char *TOKEN_STRINGS[100] = {
+const char *TOKEN_STRINGS[100] = {
 	"TOKEN_UNDEFINED", //
 	"TOKEN_NEW_LINE", //
 	"TOKEN_SEMICOLON", //

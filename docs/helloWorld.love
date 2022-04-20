@@ -1,3 +1,1 @@
-int foo = 2;
-int buzz = 4;
-print("Hello World", "Bye", foo, buzz);
+print("Hello World", "Bye");  print("WJHAT");

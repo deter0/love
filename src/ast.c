@@ -47,7 +47,6 @@ void executionStartAddMethod(ASTMethod *ASTNodeStartExecution, ASTMethod *to_add
 	Data->MethodsLength++;
 }
 
-#define VARIABLE_TYPE "MethodDeclareVariable"
 ASTMethod *declareVariableNode() {
 	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
 	method->NodeType = METHOD_DECLARE_VARIABLE;
@@ -67,7 +66,6 @@ void dumpVariableData(FILE *fd, ASTMethod *variable_method) {
 	fprintf(fd, "    Default Value: `%s`\n", data->DataStr);
 }
 
-#define FUNCTION_CALL "MethodFunctionCall"
 ASTMethod *functionCallNode() {
 	ASTMethod *method = (ASTMethod*)chp(malloc(sizeof(ASTMethod)));
 	method->NodeType = METHOD_CALL_FUNCTION;
@@ -92,6 +90,8 @@ void dumpFunctionCallData(FILE *fd, ASTMethod *functionCall) {
 		if (parameter->isConstant) {
 			if (!strcmp("string", parameter->constantType)) {
 				fprintf(fd, "\t\tParameter Constant literal: %s\n", (char*)parameter->constantData);
+			} else if (!strcmp("int", parameter->constantType)) {
+				fprintf(fd, "\t\tParameter Constant int: %d\n", *(int*)parameter->constantData);
 			} else {
 				NOT_IMPLEMENTED;
 			}
@@ -115,7 +115,6 @@ void functionCallNodeAddParameter(ASTMethod *functionCall, struct ASTNodeValue *
 	data->ParameterCount++;
 }
 
-#define NODE_VALUE "ASTNodeValue"
 struct ASTNodeValue *parseValue(TokenPool *tokens, size_t from) {
 	struct ASTNodeValue *value = (struct ASTNodeValue*)chp(malloc(sizeof(struct ASTNodeValue)));
 	value->Type = NODE_VALUE;
@@ -153,7 +152,7 @@ ASTMethod *constructAST(TokenPool *pool) {
 						char *end;
 						long value = strtol(num, &end, 10);
 						if (end == num || *end != '\0' || errno == ERANGE) {
-							set_error_cat("[PRE TYPE CHECKING TYPE ERROR]");
+							set_error_cat("[GENERATE AST]");
 							fprintf(stderr, "Error casting `%s` to int.", data->DataStr);
 							// fprintf(stderr, "Line: %d\n", get_line()) // TODO: log Lines
 							panic(true);
@@ -247,15 +246,17 @@ ASTMethod *constructAST(TokenPool *pool) {
 				}
 				executionStartAddMethod(ExecutionStart, functionCall);
 
-				i = j + 1;
+				i = j;
 			}
+		} else if (token->Type == TOKEN_SEMICOLON) {
+			continue;
 		} else {
 			set_error_cat("[CONSTRUCT AST]");
 			fprintf(stderr, "Unexpected token `%s`\n", TOKEN_STRINGS[token->Type]);
 			panic(true);
 		}
 	}
-#if 1
+#ifdef DEBUG
 	printf("\n");
 	struct ASTNodeExecutionStartData *data = (struct ASTNodeExecutionStartData*)ExecutionStart->NodeData;
 	for (size_t i = 0; i < data->MethodsLength; i++) {
