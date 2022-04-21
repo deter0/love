@@ -1,5 +1,5 @@
 #pragma once
-#include "parser.h"
+#include "reader.h"
 #include <stdio.h>
 
 typedef enum TokenType {
@@ -66,7 +66,7 @@ const char *TOKEN_STRINGS[100] = {
 
 typedef struct Token {
 	TokenType Type;
-	parse_result *ParseResult;
+	read_result *ReadResult;
 } Token;
 
 typedef struct TokenPool {

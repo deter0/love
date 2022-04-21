@@ -1,6 +1,7 @@
 #pragma once
 
 #include "log.h"
+#include "reader.h"
 #include "tokenizer.h"
 
 typedef enum ASTNodeType {

@@ -1,5 +1,5 @@
 #include "tokenizer.h"
-#include "parser.h"
+#include "reader.h"
 #include "log.h"
 
 #include <string.h>
@@ -23,7 +23,7 @@ char *indent = "";
 void logTokenPool(FILE *fd, TokenPool *self) {
 	fprintf(fd, "%s%sTokenPool%s {\n", indent, TERM_CYAN(), TERM_DEFAULT());
 	for (size_t i = 0; i < self->Length; i++) {
-		char *val = get_value(self->Tokens[i]->ParseResult);
+		char *val = get_value(self->Tokens[i]->ReadResult);
 		if (!strcmp(val, "\n")) {
 			val = "<NEW LINE>";
 		}
@@ -31,7 +31,7 @@ void logTokenPool(FILE *fd, TokenPool *self) {
 			"\t%sToken %s<%s>%s: %s\"%s\"%s,\n",
 			indent, TERM_RED(),
 			TOKEN_STRINGS[self->Tokens[i]->Type], TERM_DEFAULT(), TERM_GREEN(),
-			get_value(self->Tokens[i]->ParseResult), TERM_DEFAULT()
+			get_value(self->Tokens[i]->ReadResult), TERM_DEFAULT()
 		);
 	}
 	fprintf(fd, "%s}\n", indent);
@@ -85,7 +85,7 @@ TokenPool2D *tokenPoolSplit(TokenPool *pool, TokenType Delimeter) {
 	return result;
 }
 
-TokenPool *Tokenize(parse_result_pool *parsed) {
+TokenPool *Tokenize(read_result_pool *parsed) {
 	TokenPool *tokenPool = (TokenPool*)chp(calloc(1, sizeof(TokenPool)));
 	tokenPool->Allocated = 200;
 	tokenPool->Tokens = (Token**)chp(calloc(1, sizeof(Token) * tokenPool->Allocated));
@@ -182,7 +182,7 @@ TokenPool *Tokenize(parse_result_pool *parsed) {
 		} else {
 			tkn->Type = TOKEN_WORD;
 		}
-		tkn->ParseResult = parsed->results[i];
+		tkn->ReadResult = parsed->results[i];
 		if (tkn->Type != TOKEN_UNDEFINED) {
 			if (tokenPool->Length > 0 && tokenPool->Tokens[tokenPool->Length - 1]->Type == TOKEN_COMMENT && tkn->Type != TOKEN_NEW_LINE) {
 				continue;
@@ -196,10 +196,10 @@ TokenPool *Tokenize(parse_result_pool *parsed) {
 		}
 	}
 	Token *eof = (Token*)chp(malloc(sizeof(Token)));
-	eof->ParseResult = (parse_result*)chp(malloc(sizeof(parse_result)));
-	eof->ParseResult->is_end = true;
-	eof->ParseResult->length = 1;
-	eof->ParseResult->ptr_start = parsed->src + strlen(parsed->src-1);
+	eof->ReadResult = (read_result*)chp(malloc(sizeof(read_result)));
+	eof->ReadResult->is_end = true;
+	eof->ReadResult->length = 1;
+	eof->ReadResult->ptr_start = parsed->src + strlen(parsed->src-1);
 	eof->Type = TOKEN_EOF;
 	addToken(tokenPool, eof);
 	return tokenPool;

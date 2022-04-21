@@ -1,5 +1,5 @@
-#include "src/log.h"
-#include "src/parser.h"
+#include "log.h"
+#include "reader.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +11,7 @@
 #include "ast.h"
 
 #include "tokenizer.c"
-#include "parser.c"
+#include "reader.c"
 #include "log.c"
 #include "ast.c"
 #include "interpreter.c"
@@ -89,13 +89,12 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error reading file `%s`: %s", input_files[i], strerror(errno));
                 panic(true);
             }
-            parse_result_pool *parsed = parse_string(file);
-            TokenPool *tokens = Tokenize(parsed);
+            read_result_pool *read_resultd = read_string(file);
+            TokenPool *tokens = Tokenize(read_resultd);
             ASTMethod *root = constructAST(tokens);
             interpretProgram(root);
         }
     }
-
 
     return 0;
 }

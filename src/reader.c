@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "reader.h"
 #include "log.h"
 
 #include <stdlib.h>
@@ -49,10 +49,10 @@ int get_split_data(char character) {
 	}
 }
 
-void add_parse_result(parse_result_pool *pool, parse_result *to_add) {
+void add_read_result(read_result_pool *pool, read_result *to_add) {
 	if (pool->length + 1 >= pool->allocated) {
 		pool->allocated = pool->allocated * 1.5 + 10;
-		pool->results = (parse_result **)realloc((void*)pool->results, sizeof(parse_result*) * pool->allocated);
+		pool->results = (read_result **)realloc((void*)pool->results, sizeof(read_result*) * pool->allocated);
 		if (pool->results == NULL) {
 			fprintf(stderr, "Error reallocating pool memory.\n");
 			exit(1);
@@ -62,7 +62,7 @@ void add_parse_result(parse_result_pool *pool, parse_result *to_add) {
 	pool->length++;
 }
 
-void free_parse_result_pool(parse_result_pool *pool) {
+void free_read_result_pool(read_result_pool *pool) {
 	for (size_t i = 0; i < pool->length; i++) {
 		free(pool->results[i]);
 	}
@@ -79,31 +79,31 @@ size_t get_line(char *string, size_t index) {
 	return count;
 }
 
-char *get_value(parse_result *parse) {
-	char *buffer = (char *)malloc(sizeof(char) * (parse->length + 1));
+char *get_value(read_result *read) {
+	char *buffer = (char *)malloc(sizeof(char) * (read->length + 1));
 	assert(buffer != NULL && "error allocating string.");
 	if (buffer == NULL) {
-		fprintf(stderr, "Error allocating buffer of size %s %ld\n", parse->ptr_start, parse->length + 1);
+		fprintf(stderr, "Error allocating buffer of size %s %ld\n", read->ptr_start, read->length + 1);
 		exit(1);
 	}
-	size_t ptr_size = strlen(parse->ptr_start);
-	for (size_t k = 0; k < parse->length && k < ptr_size; k++) {
-		buffer[k] = parse->ptr_start[k];
+	size_t ptr_size = strlen(read->ptr_start);
+	for (size_t k = 0; k < read->length && k < ptr_size; k++) {
+		buffer[k] = read->ptr_start[k];
 	}
-	buffer[parse->length] = '\0';
+	buffer[read->length] = '\0';
 	return buffer;
 }
 
-size_t get_index(parse_result_pool *pool, parse_result *result) {
+size_t get_index(read_result_pool *pool, read_result *result) {
 	size_t srclen = strlen(pool->src);
 	size_t diff_to_end = strlen(result->ptr_start);
 	return srclen - diff_to_end;
 }
 
-parse_result_pool *parse_string(char *string) {
-	parse_result_pool *pool = (parse_result_pool *)chp(calloc(1, sizeof(parse_result_pool)));
+read_result_pool *read_string(char *string) {
+	read_result_pool *pool = (read_result_pool *)chp(calloc(1, sizeof(read_result_pool)));
 	pool->allocated = 50;
-	pool->results = (parse_result **)calloc(pool->allocated, sizeof(parse_result*));
+	pool->results = (read_result **)calloc(pool->allocated, sizeof(read_result*));
 	// for (size_t n = 0; n < strlen(string); n++) {
 	// 	if (string[n] == '\n') {
 	// 		string[n] = ' ';
@@ -141,33 +141,33 @@ parse_result_pool *parse_string(char *string) {
 			int split_data = get_split_data(string[i]);
 			switch (split_data) {
 			case 1:
-				//parse_result *thing = (parse_result *)malloc(sizeof(parse_result));
+				//read_result *thing = (read_result *)malloc(sizeof(read_result));
 				{
-					parse_result *before_i = (parse_result *)malloc(sizeof(parse_result));
+					read_result *before_i = (read_result *)malloc(sizeof(read_result));
 					assert(before_i != NULL && "error allocating memory (1).\n");
 					before_i->ptr_start = string + t;
 					before_i->length = i - t;
 					before_i->is_end = false;
-					add_parse_result(pool, before_i);
+					add_read_result(pool, before_i);
 					t = i + 1;
 				}
 				break;
 			
 			case 2:
 				{
-					parse_result *before_i = (parse_result *)malloc(sizeof(parse_result));
+					read_result *before_i = (read_result *)malloc(sizeof(read_result));
 					assert(before_i != NULL && "error allocating memory (2).\n");
 					before_i->ptr_start = string + t;
 					before_i->length = i - t;
 					before_i->is_end = false;
-					add_parse_result(pool, before_i);
+					add_read_result(pool, before_i);
 					
-					parse_result *character = (parse_result *)malloc(sizeof(parse_result));
+					read_result *character = (read_result *)malloc(sizeof(read_result));
 					assert(character != NULL && "error allocating memory (3).\n");
 					character->ptr_start = string + i;
 					character->length = 1;
 					character->is_end = false;
-					add_parse_result(pool, character);
+					add_read_result(pool, character);
 					t = i + 1;
 				}
 				break;
@@ -179,19 +179,19 @@ parse_result_pool *parse_string(char *string) {
 		i++;
 	}
 	
-	parse_result_pool *pool_fixed = (parse_result_pool *)chp(calloc(1, sizeof(parse_result_pool)));
+	read_result_pool *pool_fixed = (read_result_pool *)chp(calloc(1, sizeof(read_result_pool)));
 	pool_fixed->allocated = pool->allocated;
-	pool_fixed->results = (parse_result **)calloc(pool_fixed->allocated, sizeof(parse_result*));
+	pool_fixed->results = (read_result **)calloc(pool_fixed->allocated, sizeof(read_result*));
 	pool_fixed->src = string;
 
 	for (size_t i = 0; i < pool->length; i++) {
 		if (pool->results[i]->length > 0) {
-			parse_result *result = (parse_result*)chp(calloc(1, sizeof(parse_result)));
-			memcpy(result, pool->results[i], sizeof(parse_result));
-			add_parse_result(pool_fixed, result);
+			read_result *result = (read_result*)chp(calloc(1, sizeof(read_result)));
+			memcpy(result, pool->results[i], sizeof(read_result));
+			add_read_result(pool_fixed, result);
 		}
 	}
-	free_parse_result_pool(pool);
+	free_read_result_pool(pool);
 #ifdef DEBUG
 	for (size_t k = 0; k < pool_fixed->length; k++) {
 		char *val = get_value(pool_fixed->results[k]);
